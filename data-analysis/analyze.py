@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import math
 import sys
+from git import *
 PATH = "./COVID-19/csse_covid_19_data/csse_covid_19_time_series"
 
 LOG = False
@@ -106,10 +107,10 @@ def build_title(country):
     global LOG
     virus = 'SARS-CoV-2'
     if LOG:
-        fmt = virus + " in %s (logarithmically scaled)" 
+        fmt = virus + " in %s (logarithmically scaled) - %s"
     else:
-        fmt = virus + " in %s" 
-    return fmt % country
+        fmt = virus + " in %s - %s"
+    return fmt % (country, get_submodule_commit_date())
 
 def analyze(country):
     global PNG
