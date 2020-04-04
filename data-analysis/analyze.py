@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import math
 import sys
 from git import *
+from util import *
+
 PATH = "./COVID-19/csse_covid_19_data/csse_covid_19_time_series"
 
 LOG = False
@@ -47,22 +49,6 @@ def parse_line(line, dates):
             break
     return country, time_series
 
-def sort_dict(d, len = -1):
-    ret = {}
-    idx = 0
-    for k in sorted(d, key=d.get, reverse=False):
-        ret[k] = d[k]
-        idx = idx +1
-        if idx == len and len != -1:
-            break
-    return ret
-
-def add_time_series(old, new):
-    ret = {}
-    for date, old in old.items():
-        ret[date] = old + new[date]
-    return ret
-
 def parse_file(f):
     lines = {}
     with open(f, 'r') as fd:
@@ -97,7 +83,7 @@ def parse_all():
 
     return ret
 
-def print_dicht(m, style, label):
+def plot_dict(m, style, label):
     m = sort_dict(m)
     vals = list(m.values())
     keys = list(m.keys())
@@ -122,9 +108,9 @@ def analyze(country):
 
     size = 10
     plt.figure(figsize=(size*3, size))
-    print_dicht(country_data.confirmed_series, 'b', "confirmed")
-    print_dicht(country_data.death_series, 'r', "deaths")
-    print_dicht(country_data.recovered_series, 'g', "recovered")
+    plot_dict(country_data.confirmed_series, 'b', "confirmed")
+    plot_dict(country_data.death_series, 'r', "deaths")
+    plot_dict(country_data.recovered_series, 'g', "recovered")
     plt.xticks(rotation=90)
     plt.figlegend()
     if GRID:
@@ -139,11 +125,6 @@ def analyze(country):
         plt.savefig('%s.png' % country.lower(), orientation = 'landscape', dpi = 150)
     #parsed = [p for p in parse_file(f) if p is not None]
     #foo(parsed)
-
-def run_action_on_arg(wanted, fn):
-    for arg in sys.argv[1:]:
-        if arg == wanted:
-            fn()
 
 def print_usage():
     print("Usage: %s <country> [--log]" % sys.argv[0])
