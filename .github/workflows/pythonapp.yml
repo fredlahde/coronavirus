@@ -35,3 +35,7 @@ jobs:
       run: |
         ./gen.sh
       working-directory: data-analysis
+    - uses: actions/upload-artifact@v1
+      with:
+        name: graphs
+        path: data-analysis/png-rendered
