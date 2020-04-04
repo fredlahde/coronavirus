@@ -1,7 +1,10 @@
 import os
 import matplotlib.pyplot as plt
 import math
+import sys
 PATH = "./COVID-19/csse_covid_19_data/csse_covid_19_time_series"
+
+LOG = False
 
 class TimeSeriesReportEntry():
     def __init__(self, country, confirmed_series, death_series, recovered_series):
@@ -31,15 +34,21 @@ def parse_line(line, dates):
         return None
     country = split[1]
     time_series = {}
-    for i in range(4, len(split) - 4):
+    date_idx = 0
+    global LOG
+    for i in range(4, len(split)):
         val = float(split[i])
         if val > 0:
             try:
-                val = math.log2(val)
+                if LOG:
+                    val = math.log2(val)
             except ValueError:
                 print(val)
                 exit(234)
-        time_series[dates[i-4]] = val
+        time_series[dates[date_idx]] = val
+        date_idx = date_idx + 1
+        if date_idx > len(dates) -1:
+            break
     return country, time_series
 
 def sort_dict(d, len = -1):
@@ -98,10 +107,10 @@ def print_dicht(m, style, label):
     keys = list(m.keys())
     plt.plot_date(keys, vals,style)
 
-def analyze():
+def analyze(country):
     parsed = parse_all()
 
-    country_data = parsed['Germany']
+    country_data = parsed[country]
 
     print_dicht(country_data.confirmed_series, 'b', "confirmed")
     print_dicht(country_data.death_series, 'r', "deaths")
@@ -111,4 +120,18 @@ def analyze():
     #parsed = [p for p in parse_file(f) if p is not None]
     #foo(parsed)
 
-analyze()
+def print_usage():
+    print("Usage: %s <country> [--log]" % sys.argv[0])
+    exit(1)
+
+if len(sys.argv) == 1:
+    print_usage()
+
+for arg in sys.argv[1:]:
+    if arg == "--help":
+        print_usage()
+
+country = sys.argv[1]
+if len(sys.argv) > 2 and sys.argv[2] == "--log":
+    LOG = True
+analyze(country)
