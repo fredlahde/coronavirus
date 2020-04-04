@@ -5,6 +5,8 @@ import sys
 PATH = "./COVID-19/csse_covid_19_data/csse_covid_19_time_series"
 
 LOG = False
+PNG = False
+GRID = False
 
 class TimeSeriesReportEntry():
     def __init__(self, country, confirmed_series, death_series, recovered_series):
@@ -38,13 +40,6 @@ def parse_line(line, dates):
     global LOG
     for i in range(4, len(split)):
         val = float(split[i])
-        if val > 0:
-            try:
-                if LOG:
-                    val = math.log2(val)
-            except ValueError:
-                print(val)
-                exit(234)
         time_series[dates[date_idx]] = val
         date_idx = date_idx + 1
         if date_idx > len(dates) -1:
@@ -105,20 +100,49 @@ def print_dicht(m, style, label):
     m = sort_dict(m)
     vals = list(m.values())
     keys = list(m.keys())
-    plt.plot_date(keys, vals,style)
+    plt.plot_date(keys, vals,style, label=label)
+
+def build_title(country):
+    global LOG
+    virus = 'SARS-CoV-2'
+    if LOG:
+        fmt = virus + " in %s (logarithmically scaled)" 
+    else:
+        fmt = virus + " in %s" 
+    return fmt % country
 
 def analyze(country):
+    global PNG
+    global LOG
+    global GRID
     parsed = parse_all()
 
     country_data = parsed[country]
 
+    size = 10
+    plt.figure(figsize=(size*3, size))
     print_dicht(country_data.confirmed_series, 'b', "confirmed")
     print_dicht(country_data.death_series, 'r', "deaths")
     print_dicht(country_data.recovered_series, 'g', "recovered")
     plt.xticks(rotation=90)
-    plt.show()
+    plt.figlegend()
+    if GRID:
+        plt.grid(True, axis='x')
+    if LOG:
+        plt.yscale('log')
+    plt.title(build_title(country))
+    #plt.xscale(.5)
+    if PNG == False:
+        plt.show()
+    else:
+        plt.savefig('%s.png' % country.lower(), orientation = 'landscape', dpi = 150)
     #parsed = [p for p in parse_file(f) if p is not None]
     #foo(parsed)
+
+def run_action_on_arg(wanted, fn):
+    for arg in sys.argv[1:]:
+        if arg == wanted:
+            fn()
 
 def print_usage():
     print("Usage: %s <country> [--log]" % sys.argv[0])
@@ -127,11 +151,21 @@ def print_usage():
 if len(sys.argv) == 1:
     print_usage()
 
-for arg in sys.argv[1:]:
-    if arg == "--help":
-        print_usage()
+run_action_on_arg("--help", print_usage)
+def set_png():
+    global PNG
+    PNG = True
+run_action_on_arg("--png" , set_png)
+
+def set_grid():
+    global GRID
+    GRID = True
+run_action_on_arg("--grid", set_grid)
+
+def set_log():
+    global LOG
+    LOG = True
+run_action_on_arg("--log" , set_log)
 
 country = sys.argv[1]
-if len(sys.argv) > 2 and sys.argv[2] == "--log":
-    LOG = True
 analyze(country)
