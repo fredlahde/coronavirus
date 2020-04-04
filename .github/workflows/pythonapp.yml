@@ -29,4 +29,4 @@ jobs:
         pip install -r data-analysis/requirements.txt
     - name: Build graphs
       run: |
-        bash data-analysis/gen.sh
+        cd data-analysis && ./gen.sh
