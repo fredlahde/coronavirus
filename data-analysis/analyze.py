@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import math
 import sys
 from util import *
+from csv import *
 
 PATH = "./COVID-19/csse_covid_19_data/csse_covid_19_time_series"
 
@@ -33,7 +34,7 @@ def parse_line(line, dates):
     3: lng
     4 and further: time series
     """
-    split = line.split(',')
+    split = parse_csv_line(line)
     if len(split) < 2:
         return None
     country = split[1]
@@ -121,9 +122,7 @@ def analyze(country):
     if PNG == False:
         plt.show()
     else:
-        plt.savefig('%s.png' % country.lower(), orientation = 'landscape', dpi = 150)
-    #parsed = [p for p in parse_file(f) if p is not None]
-    #foo(parsed)
+        plt.savefig('%s.png' % country.lower().replace(', ', '_'), orientation = 'landscape', dpi = 150)
 
 def print_usage():
     print("Usage: %s <country> [--log]" % sys.argv[0])
