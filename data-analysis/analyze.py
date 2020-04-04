@@ -5,8 +5,6 @@ import sys
 from util import *
 from csv import *
 
-PATH = "./COVID-19/csse_covid_19_data/csse_covid_19_time_series"
-
 LOG = False
 PNG = False
 GRID = False
@@ -147,5 +145,7 @@ def set_log():
     LOG = True
 run_action_on_arg("--log" , set_log)
 
-country = sys.argv[1]
+PATH = sys.argv[1]
+country = sys.argv[2]
 analyze(country)
+
