@@ -37,14 +37,10 @@ def parse_line(line, dates):
         return None
     country = split[1]
     time_series = {}
-    date_idx = 0
-    global LOG
-    for i in range(4, len(split)):
-        val = float(split[i])
-        time_series[dates[date_idx]] = val
-        date_idx = date_idx + 1
-        if date_idx > len(dates) -1:
-            break
+    data_points = split[4:]
+    for i in range(0, len(data_points)):
+        val = float(data_points[i])
+        time_series[dates[i]] = val
     return country, time_series
 
 def parse_file(f):
@@ -123,7 +119,7 @@ def analyze(country):
         plt.savefig('%s.png' % country.lower().replace(', ', '_'), orientation = 'landscape', dpi = 150)
 
 def print_usage():
-    print("Usage: %s <country> [--log]" % sys.argv[0])
+    print("Usage: %s <country> [--log, --grid, --png]" % sys.argv[0])
     exit(1)
 
 if len(sys.argv) == 1:

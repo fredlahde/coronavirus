@@ -26,4 +26,6 @@ def parse_csv_line(line):
                 tmp += c
         i += 1
 
+    if tmp != "":
+        ret.append(tmp)
     return ret
